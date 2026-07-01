@@ -1,0 +1,195 @@
+<!-- detector/templates/detector/index.html -->
+
+{% extends 'detector/base.html' %}
+
+{% block title %}Home - SpamDetector Pro{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="hero-section">
+        <div class="hero-badge">⚡ Powered by Advanced AI</div>
+        <h1 class="hero-title">Detect Spam<br>Instantly</h1>
+        <p class="hero-subtitle">
+            <strong>98% accuracy</strong> — Advanced machine learning model
+            to detect spam comments in real-time
+        </p>
+    </div>
+
+    <div class="glass-card">
+        <div class="form-label">
+            <span class="label-dot"></span>
+            Enter Your Comment
+        </div>
+
+        <form id="spamForm">
+            <div class="input-wrapper">
+                <i class="fas fa-pen-to-square input-icon"></i>
+                <textarea id="commentInput" placeholder="Type or paste your comment here..." required></textarea>
+                <div class="char-counter"><span id="charCount">0</span> characters</div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="submitBtn">
+                <i class="fas fa-rocket"></i>
+                <span>Analyze Now</span>
+            </button>
+        </form>
+
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <span>Analyzing your comment...</span>
+        </div>
+
+        <div class="result" id="result">
+            <div class="result-icon" id="resultIcon"></div>
+            <h2 id="resultTitle"></h2>
+            <div class="result-details">
+                <p><i class="fas fa-comment"></i> <strong>Original:</strong> <span id="originalText"></span></p>
+                <p><i class="fas fa-wand-magic-sparkles"></i> <strong>Processed:</strong> <span id="processedText"></span></p>
+            </div>
+            <div class="probability-section">
+                <div class="prob-item">
+                    <span>📬 Ham (Normal)</span>
+                    <span class="prob-value" id="hamProb">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="probFill" style="width: 0%;"></div>
+                </div>
+                <div class="prob-item" style="margin-top:8px;">
+                    <span>🚨 Spam</span>
+                    <span class="prob-value" id="spamProb">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-section">
+        <div class="stat-card">
+            <span class="stat-icon" style="color:#22c55e;">✅</span>
+            <span class="stat-number" id="hamCount">0</span>
+            <span class="stat-label">Ham (Clean)</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-icon" style="color:#ef4444;">🚨</span>
+            <span class="stat-number" id="spamCount">0</span>
+            <span class="stat-label">Spam Detected</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-icon" style="color:#667eea;">📊</span>
+            <span class="stat-number" id="totalCount">0</span>
+            <span class="stat-label">Total Analyzed</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===== Character Counter =====
+    document.getElementById('commentInput').addEventListener('input', function() {
+        document.getElementById('charCount').textContent = this.value.length;
+    });
+
+    // ===== Stats =====
+    let stats = { ham: 0, spam: 0, total: 0 };
+
+    function updateStats(isSpam) {
+        if (isSpam) stats.spam++;
+        else stats.ham++;
+        stats.total++;
+
+        document.getElementById('hamCount').textContent = stats.ham;
+        document.getElementById('spamCount').textContent = stats.spam;
+        document.getElementById('totalCount').textContent = stats.total;
+    }
+
+    // ===== Form Submit =====
+    document.getElementById('spamForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const comment = document.getElementById('commentInput').value.trim();
+        if (!comment) return;
+
+        const loader = document.getElementById('loader');
+        const resultDiv = document.getElementById('result');
+        const submitBtn = document.getElementById('submitBtn');
+
+        loader.classList.add('show');
+        resultDiv.classList.remove('show', 'spam', 'ham');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+
+        try {
+            const formData = new FormData();
+            formData.append('comment', comment);
+
+            const response = await fetch('/predict/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+
+            // Show result
+            resultDiv.className = 'result show ' + (data.is_spam ? 'spam' : 'ham');
+
+            const icon = document.getElementById('resultIcon');
+            if (data.is_spam) {
+                icon.innerHTML = '🚨';
+                document.getElementById('resultTitle').textContent = '⚠️ Spam Detected!';
+            } else {
+                icon.innerHTML = '✅';
+                document.getElementById('resultTitle').textContent = '✔️ Ham — Clean Comment';
+            }
+
+            document.getElementById('originalText').textContent = data.comment;
+            document.getElementById('processedText').textContent = data.processed || '---';
+            document.getElementById('spamProb').textContent = data.spam_probability + '%';
+            document.getElementById('hamProb').textContent = data.ham_probability + '%';
+
+            // Animate progress bar
+            const fill = document.getElementById('probFill');
+            fill.style.width = data.spam_probability + '%';
+
+            // GSAP animation for result
+            gsap.from(resultDiv, {
+                duration: 0.7,
+                scale: 0.9,
+                opacity: 0,
+                ease: 'back.out(1.7)'
+            });
+
+            updateStats(data.is_spam);
+
+            document.getElementById('commentInput').value = '';
+            document.getElementById('charCount').textContent = '0';
+
+            setTimeout(() => location.reload(), 3000);
+
+        } catch (error) {
+            alert('Connection error! Please try again.');
+            console.error(error);
+        } finally {
+            loader.classList.remove('show');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-rocket"></i> Analyze Now';
+        }
+    });
+
+    // ===== Hover Animations =====
+    document.querySelectorAll('.stat-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            gsap.to(this, { scale: 1.05, duration: 0.3, ease: 'power2.out' });
+        });
+        card.addEventListener('mouseleave', function() {
+            gsap.to(this, { scale: 1, duration: 0.3, ease: 'power2.out' });
+        });
+    });
+</script>
+{% endblock %}

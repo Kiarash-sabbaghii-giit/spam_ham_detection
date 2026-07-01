@@ -1,0 +1,104 @@
+<!-- detector/templates/detector/history.html -->
+
+{% extends 'detector/base.html' %}
+
+{% block title %}History - SpamDetector Pro{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="glass-card">
+        <div class="history-header">
+            <h1><i class="fas fa-clock-rotate-left"></i> Prediction History</h1>
+            <button id="clearHistory" class="btn-danger">
+                <i class="fas fa-trash-can"></i> Clear All
+            </button>
+        </div>
+
+        <div id="historyList">
+            {% if history %}
+                {% for item in history %}
+                <div class="history-item {% if item.is_spam %}spam{% else %}ham{% endif %}">
+                    <div class="history-icon">
+                        <i class="fas {% if item.is_spam %}fa-circle-xmark{% else %}fa-circle-check{% endif %}"
+                           style="color:{% if item.is_spam %}#ef4444{% else %}#22c55e{% endif %};"></i>
+                    </div>
+                    <div class="history-content">
+                        <p class="history-text">{{ item.comment|truncatechars:120 }}</p>
+                        <div class="history-meta">
+                            <span class="history-label {% if item.is_spam %}spam-label{% else %}ham-label{% endif %}">
+                                {% if item.is_spam %}🚨 Spam{% else %}✅ Ham{% endif %}
+                            </span>
+                            <span>
+                                <i class="far fa-clock"></i> {{ item.timestamp }}
+                            </span>
+                            <span>
+                                <i class="fas fa-chart-simple"></i> Spam: {{ item.spam_probability }}%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p>No predictions yet</p>
+                    <p class="sub-text">Start analyzing comments on the home page</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===== Clear History =====
+    document.getElementById('clearHistory').addEventListener('click', function() {
+        if (confirm('Are you sure you want to clear all history?')) {
+            fetch('/clear-history/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            }).then(() => {
+                location.reload();
+            }).catch(() => {
+                alert('Error clearing history!');
+            });
+        }
+    });
+
+    // ===== Animate History Items =====
+    document.addEventListener('DOMContentLoaded', function() {
+        gsap.from('.history-item', {
+            duration: 0.7,
+            x: -40,
+            opacity: 0,
+            stagger: 0.06,
+            ease: 'power3.out',
+            delay: 0.2,
+            scrollTrigger: {
+                trigger: '#historyList',
+                start: 'top bottom-=50',
+                toggleActions: 'play none none none'
+            }
+        });
+
+        // Hover animation
+        document.querySelectorAll('.history-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                gsap.to(this, {
+                    scale: 1.02,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
+            item.addEventListener('mouseleave', function() {
+                gsap.to(this, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

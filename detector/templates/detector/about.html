@@ -1,0 +1,117 @@
+<!-- detector/templates/detector/about.html -->
+
+{% extends 'detector/base.html' %}
+
+{% block title %}About - SpamDetector Pro{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="glass-card">
+        <div class="about-section">
+            <div class="about-icon">🤖</div>
+            <h1>About SpamDetector</h1>
+            <p class="about-sub">Enterprise-Grade AI Spam Detection</p>
+            <p class="about-desc">
+                SpamDetector is a cutting-edge <strong>Machine Learning</strong> solution
+                powered by <strong>Logistic Regression</strong> and advanced
+                <strong>Natural Language Processing</strong>. With an impressive
+                <strong>98% accuracy</strong>, it can distinguish between spam and
+                legitimate comments in milliseconds.
+            </p>
+
+            <div class="features-grid">
+                <div class="feature">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Lightning Speed</h3>
+                    <p>Real-time predictions with latency under 100ms</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-gem"></i>
+                    <h3>98% Accuracy</h3>
+                    <p>State-of-the-art performance using TF-IDF & N-gram</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-shield-halved"></i>
+                    <h3>Enterprise Security</h3>
+                    <p>Your data is never stored — 100% privacy guaranteed</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-scale-balanced"></i>
+                    <h3>Scalable</h3>
+                    <p>Designed to handle millions of requests</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-code"></i>
+                    <h3>API Ready</h3>
+                    <p>Seamless integration with any application</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-gauge-high"></i>
+                    <h3>High Performance</h3>
+                    <p>Optimized for production environments</p>
+                </div>
+            </div>
+
+            <div class="tech-stack">
+                <h3>🛠️ Technology Stack</h3>
+                <div class="tech-tags">
+                    <span class="tag">Python 3.14</span>
+                    <span class="tag">Django 6.0</span>
+                    <span class="tag">Scikit-learn</span>
+                    <span class="tag">Logistic Regression</span>
+                    <span class="tag">TF-IDF</span>
+                    <span class="tag">NLTK</span>
+                    <span class="tag">GSAP</span>
+                    <span class="tag">HTML5</span>
+                    <span class="tag">CSS3</span>
+                    <span class="tag">JavaScript</span>
+                    <span class="tag">REST API</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate features
+        gsap.from('.feature', {
+            duration: 0.8,
+            y: 50,
+            opacity: 0,
+            stagger: 0.1,
+            ease: 'power3.out',
+            delay: 0.2,
+            scrollTrigger: {
+                trigger: '.features-grid',
+                start: 'top bottom-=50',
+                toggleActions: 'play none none none'
+            }
+        });
+
+        // Animate tags
+        gsap.from('.tag', {
+            duration: 0.5,
+            scale: 0,
+            opacity: 0,
+            stagger: 0.04,
+            ease: 'back.out(1.7)',
+            delay: 0.5,
+            scrollTrigger: {
+                trigger: '.tech-tags',
+                start: 'top bottom-=30',
+                toggleActions: 'play none none none'
+            }
+        });
+
+        // Animate about icon
+        gsap.to('.about-icon', {
+            duration: 2,
+            rotation: 360,
+            ease: 'power1.inOut',
+            repeat: -1,
+            yoyo: true
+        });
+    });
+</script>
+{% endblock %}
