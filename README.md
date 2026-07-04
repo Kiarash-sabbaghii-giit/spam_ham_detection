@@ -340,7 +340,7 @@ The interface was carefully designed to provide a premium user experience.
 
 ```
 
-assets/screenshots/home.png
+![Home Page](/assets/screenshots/home.png)
 ```
 
 ---
@@ -349,7 +349,7 @@ assets/screenshots/home.png
 
 ```
 
-assets/screenshots/history.png
+![History Page](/assets/screenshots/history.png)
 ```
 
 ---
@@ -358,7 +358,7 @@ assets/screenshots/history.png
 
 ```
 
-assets/screenshots/about.png
+![About Page](/assets/screenshots/about.png)
 ```
 
 ---
