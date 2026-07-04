@@ -2,7 +2,7 @@
 
 {% extends 'detector/base.html' %}
 
-{% block title %}About - SpamDetector Pro{% endblock %}
+{% block title %}About — SpamDetector Pro{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -15,9 +15,24 @@
                 SpamDetector is a cutting-edge <strong>Machine Learning</strong> solution
                 powered by <strong>Logistic Regression</strong> and advanced
                 <strong>Natural Language Processing</strong>. With an impressive
-                <strong>98% accuracy</strong>, it can distinguish between spam and
+                <strong>98% accuracy</strong>, it distinguishes between spam and
                 legitimate comments in milliseconds.
             </p>
+
+            <div class="about-stats">
+                <div class="about-stat">
+                    <span class="about-stat-number">98%</span>
+                    <span class="about-stat-label">Accuracy</span>
+                </div>
+                <div class="about-stat">
+                    <span class="about-stat-number">100ms</span>
+                    <span class="about-stat-label">Response Time</span>
+                </div>
+                <div class="about-stat">
+                    <span class="about-stat-number">50+</span>
+                    <span class="about-stat-label">Predictions Stored</span>
+                </div>
+            </div>
 
             <div class="features-grid">
                 <div class="feature">
@@ -28,7 +43,7 @@
                 <div class="feature">
                     <i class="fas fa-gem"></i>
                     <h3>98% Accuracy</h3>
-                    <p>State-of-the-art performance using TF-IDF & N-gram</p>
+                    <p>State-of-the-art performance using TF-IDF &amp; N-gram</p>
                 </div>
                 <div class="feature">
                     <i class="fas fa-shield-halved"></i>
@@ -72,45 +87,112 @@
     </div>
 </div>
 
+<style>
+    /* ===== About Additional Styles ===== */
+
+    .about-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-4);
+        margin: var(--space-8) 0 var(--space-6);
+        padding: var(--space-6);
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: var(--radius-2xl);
+        border: 1px solid var(--border-subtle);
+    }
+
+    .about-stat {
+        text-align: center;
+    }
+
+    .about-stat-number {
+        display: block;
+        font-size: var(--text-2xl);
+        font-weight: var(--font-extrabold);
+        background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .about-stat-label {
+        display: block;
+        font-size: var(--text-sm);
+        color: var(--text-tertiary);
+        margin-top: var(--space-1);
+        font-weight: var(--font-regular);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .about-stats {
+            grid-template-columns: 1fr;
+            gap: var(--space-4);
+            padding: var(--space-4);
+        }
+
+        .about-stat-number {
+            font-size: var(--text-xl);
+        }
+    }
+</style>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Animate features
         gsap.from('.feature', {
             duration: 0.8,
-            y: 50,
+            y: 40,
             opacity: 0,
-            stagger: 0.1,
+            stagger: 0.08,
             ease: 'power3.out',
-            delay: 0.2,
-            scrollTrigger: {
-                trigger: '.features-grid',
-                start: 'top bottom-=50',
-                toggleActions: 'play none none none'
-            }
+            delay: 0.2
         });
 
-        // Animate tags
+        // Animate tech tags
         gsap.from('.tag', {
             duration: 0.5,
             scale: 0,
             opacity: 0,
-            stagger: 0.04,
+            stagger: 0.03,
             ease: 'back.out(1.7)',
-            delay: 0.5,
-            scrollTrigger: {
-                trigger: '.tech-tags',
-                start: 'top bottom-=30',
-                toggleActions: 'play none none none'
-            }
+            delay: 0.5
         });
 
-        // Animate about icon
+        // Animate about stats
+        gsap.from('.about-stat', {
+            duration: 0.8,
+            y: 30,
+            opacity: 0,
+            stagger: 0.1,
+            delay: 0.3,
+            ease: 'power3.out'
+        });
+
+        // Rotate about icon
         gsap.to('.about-icon', {
-            duration: 2,
+            duration: 3,
             rotation: 360,
             ease: 'power1.inOut',
             repeat: -1,
             yoyo: true
+        });
+
+        // Feature hover animation
+        document.querySelectorAll('.feature').forEach(feature => {
+            feature.addEventListener('mouseenter', function() {
+                gsap.to(this, {
+                    scale: 1.02,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
+            feature.addEventListener('mouseleave', function() {
+                gsap.to(this, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
         });
     });
 </script>

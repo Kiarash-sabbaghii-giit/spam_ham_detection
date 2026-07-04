@@ -1,0 +1,363 @@
+# ============================================================
+# 🐍 Python
+# ============================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.pyo
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# pdm
+.pdm.toml
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# ============================================================
+# 🤖 Machine Learning / Models
+# ============================================================
+
+# Model files (بزرگ هستن، نباید برن روی گیت)
+*.pkl
+*.joblib
+*.h5
+*.hdf5
+*.pb
+*.tflite
+*.onnx
+*.pt
+*.pth
+*.bin
+*.model
+*.weights
+*.caffemodel
+*.prototxt
+*.mar
+*.mnn
+*.mlmodel
+*.traineddata
+
+# Vectorizers
+*.vectorizer
+*.vocab
+
+# Word embeddings
+*.vec
+*.w2v
+*.fasttext
+*.glove
+
+# Data files (دیتاهای خام رو نباید ببری گیت)
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.json
+*.jsonl
+*.parquet
+*.feather
+*.pickle
+*.pkl
+*.db
+*.sqlite
+*.sqlite3
+
+# ============================================================
+# 📊 Data Science
+# ============================================================
+
+# Jupyter Notebooks (اگه میخوای نگه داری، این خط رو کامنت کن)
+*.ipynb
+
+# Data folders
+data/
+datasets/
+samples/
+examples/
+notebooks/
+
+# ============================================================
+# 🖥️ IDE / Editor
+# ============================================================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+out/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Atom
+.atom/
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+
+# ============================================================
+# 🗂️ OS / System
+# ============================================================
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+*.icloud
+
+# Linux
+.directory
+*.tmp
+
+# ============================================================
+# 📦 Logs & Temp
+# ============================================================
+
+logs/
+*.log
+*.tmp
+*.temp
+temp/
+tmp/
+cache/
+*.cache
+
+# ============================================================
+# 🌐 Web / Frontend
+# ============================================================
+
+# Node modules
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Static files (اگه collectstatic کردی)
+staticfiles/
+static_collected/
+media/
+
+# ============================================================
+# 🔐 Secrets & Keys
+# ============================================================
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
+# Secret keys
+*.key
+*.pem
+*.crt
+*.cert
+*.csr
+*.priv
+*.pub
+
+# ============================================================
+# 📁 Project specific
+# ============================================================
+
+# Django secret key file
+secret_key.txt
+
+# Database
+*.db
+*.sqlite
+*.sqlite
+3
+
+# Uploaded files
+uploads/
+media/
+
+# ============================================================
+# 🧪 Test specific
+# ============================================================
+
+.pytest_cache/
+.tox/
+.coverage
+htmlcov/
+*.cover
+coverage.xml
+*.test
+*.spec
+
+# ============================================================
+# 📚 Documentation
+# ============================================================
+
+docs/_build/
+site/
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.toc
+
+# ============================================================
+# 🔧 Other
+# ============================================================
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Docker
+*.dockerignore
+Dockerfile
+docker-compose*.yml

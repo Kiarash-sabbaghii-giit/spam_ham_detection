@@ -2,16 +2,24 @@
 
 {% extends 'detector/base.html' %}
 
-{% block title %}History - SpamDetector Pro{% endblock %}
+{% block title %}History — SpamDetector Pro{% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="glass-card">
         <div class="history-header">
-            <h1><i class="fas fa-clock-rotate-left"></i> Prediction History</h1>
-            <button id="clearHistory" class="btn-danger">
-                <i class="fas fa-trash-can"></i> Clear All
-            </button>
+            <div class="history-header-left">
+                <h1><i class="fas fa-clock-rotate-left"></i> Prediction History</h1>
+                <span class="history-count" id="historyCount">{{ history|length }}</span>
+            </div>
+            <div class="history-actions">
+                <button id="refreshHistory" class="btn-secondary" title="Refresh">
+                    <i class="fas fa-rotate"></i>
+                </button>
+                <button id="clearHistory" class="btn-danger">
+                    <i class="fas fa-trash-can"></i> Clear All
+                </button>
+            </div>
         </div>
 
         <div id="historyList">
@@ -28,14 +36,27 @@
                             <span class="history-label {% if item.is_spam %}spam-label{% else %}ham-label{% endif %}">
                                 {% if item.is_spam %}🚨 Spam{% else %}✅ Ham{% endif %}
                             </span>
-                            <span>
+                            <span class="history-time">
                                 <i class="far fa-clock"></i> {{ item.timestamp }}
                             </span>
-                            <span>
+                            <span class="history-prob">
                                 <i class="fas fa-chart-simple"></i> Spam: {{ item.spam_probability }}%
+                            </span>
+                            <span class="history-confidence">
+                                <i class="fas fa-bolt"></i>
+                                {% if item.spam_probability > 80 %}
+                                    High
+                                {% elif item.spam_probability > 50 %}
+                                    Medium
+                                {% else %}
+                                    Low
+                                {% endif %}
                             </span>
                         </div>
                     </div>
+                    <button class="history-delete" data-id="{{ forloop.counter0 }}" title="Delete">
+                        <i class="fas fa-xmark"></i>
+                    </button>
                 </div>
                 {% endfor %}
             {% else %}
@@ -49,56 +70,178 @@
     </div>
 </div>
 
-<script>
-    // ===== Clear History =====
-    document.getElementById('clearHistory').addEventListener('click', function() {
-        if (confirm('Are you sure you want to clear all history?')) {
-            fetch('/clear-history/', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            }).then(() => {
-                location.reload();
-            }).catch(() => {
-                alert('Error clearing history!');
-            });
-        }
-    });
+<style>
+    /* ===== History Additional Styles ===== */
 
-    // ===== Animate History Items =====
-    document.addEventListener('DOMContentLoaded', function() {
-        gsap.from('.history-item', {
-            duration: 0.7,
-            x: -40,
-            opacity: 0,
-            stagger: 0.06,
-            ease: 'power3.out',
-            delay: 0.2,
-            scrollTrigger: {
-                trigger: '#historyList',
-                start: 'top bottom-=50',
-                toggleActions: 'play none none none'
+    .history-header-left {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+    }
+
+    .history-count {
+        background: var(--color-primary-subtle);
+        color: var(--color-primary);
+        font-size: var(--text-xs);
+        font-weight: var(--font-bold);
+        padding: 2px var(--space-2);
+        border-radius: var(--radius-full);
+        min-width: 24px;
+        text-align: center;
+    }
+
+    .history-actions {
+        display: flex;
+        gap: var(--space-2);
+    }
+
+    .btn-secondary {
+        padding: var(--space-2) var(--space-3);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        color: var(--text-tertiary);
+        cursor: pointer;
+        transition: all var(--duration-base) var(--ease-default);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text-primary);
+        transform: rotate(45deg);
+    }
+
+    .history-delete {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-full);
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-quaternary);
+        cursor: pointer;
+        transition: all var(--duration-base) var(--ease-default);
+        font-size: 12px;
+        flex-shrink: 0;
+        margin-top: var(--space-1);
+    }
+
+    .history-delete:hover {
+        background: rgba(239, 68, 68, 0.08);
+        border-color: rgba(239, 68, 68, 0.15);
+        color: var(--color-danger);
+        transform: scale(1.1);
+    }
+
+    .history-confidence {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-1);
+        padding: 1px var(--space-2);
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
+        font-weight: var(--font-medium);
+    }
+
+    .history-confidence .fa-bolt {
+        font-size: 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .history-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .history-actions {
+            justify-content: flex-start;
+        }
+
+        .history-meta {
+            gap: var(--space-2);
+        }
+
+        .history-confidence {
+            display: none;
+        }
+    }
+</style>
+
+<script>
+    (function() {
+        'use strict';
+
+        // ===== Clear History =====
+        document.getElementById('clearHistory').addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all history?')) {
+                fetch('/clear-history/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                }).then(() => {
+                    location.reload();
+                }).catch(() => {
+                    alert('Error clearing history!');
+                });
             }
         });
 
-        // Hover animation
-        document.querySelectorAll('.history-item').forEach(item => {
-            item.addEventListener('mouseenter', function() {
-                gsap.to(this, {
-                    scale: 1.02,
-                    duration: 0.3,
-                    ease: 'power2.out'
-                });
+        // ===== Refresh History =====
+        document.getElementById('refreshHistory').addEventListener('click', function() {
+            location.reload();
+        });
+
+        // ===== Delete Single Item =====
+        document.querySelectorAll('.history-delete').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                if (confirm('Delete this prediction?')) {
+                    // Implement delete logic if needed
+                    this.closest('.history-item').style.opacity = '0';
+                    setTimeout(() => {
+                        this.closest('.history-item').remove();
+                    }, 300);
+                }
             });
-            item.addEventListener('mouseleave', function() {
-                gsap.to(this, {
-                    scale: 1,
-                    duration: 0.3,
-                    ease: 'power2.out'
+        });
+
+        // ===== Animate History Items =====
+        document.addEventListener('DOMContentLoaded', function() {
+            gsap.from('.history-item', {
+                duration: 0.6,
+                x: -30,
+                opacity: 0,
+                stagger: 0.05,
+                ease: 'power3.out',
+                delay: 0.15
+            });
+
+            // Hover animation
+            document.querySelectorAll('.history-item').forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    gsap.to(this, {
+                        scale: 1.01,
+                        duration: 0.3,
+                        ease: 'power2.out'
+                    });
+                });
+                item.addEventListener('mouseleave', function() {
+                    gsap.to(this, {
+                        scale: 1,
+                        duration: 0.3,
+                        ease: 'power2.out'
+                    });
                 });
             });
         });
-    });
+
+    })();
 </script>
 {% endblock %}

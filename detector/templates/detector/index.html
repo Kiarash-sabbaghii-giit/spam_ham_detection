@@ -2,29 +2,38 @@
 
 {% extends 'detector/base.html' %}
 
-{% block title %}Home - SpamDetector Pro{% endblock %}
+{% block title %}Home — SpamDetector Pro{% endblock %}
 
 {% block content %}
 <div class="container">
+    <!-- Hero Section -->
     <div class="hero-section">
-        <div class="hero-badge">⚡ Powered by Advanced AI</div>
-        <h1 class="hero-title">Detect Spam<br>Instantly</h1>
+        <div class="hero-badge">
+            <span>⚡</span> AI-Powered Detection
+        </div>
+        <h1 class="hero-title">Detect Spam<br>in Real-Time</h1>
         <p class="hero-subtitle">
-            <strong>98% accuracy</strong> — Advanced machine learning model
-            to detect spam comments in real-time
+            <strong>98% accuracy</strong> — Powered by advanced machine learning
+            to identify spam comments instantly
         </p>
     </div>
 
+    <!-- Main Card -->
     <div class="glass-card">
         <div class="form-label">
             <span class="label-dot"></span>
-            Enter Your Comment
+            Enter Comment
         </div>
 
-        <form id="spamForm">
+        <form id="spamForm" novalidate>
             <div class="input-wrapper">
                 <i class="fas fa-pen-to-square input-icon"></i>
-                <textarea id="commentInput" placeholder="Type or paste your comment here..." required></textarea>
+                <textarea
+                    id="commentInput"
+                    placeholder="Type or paste your comment here..."
+                    required
+                    aria-label="Comment input for spam detection"
+                ></textarea>
                 <div class="char-counter"><span id="charCount">0</span> characters</div>
             </div>
 
@@ -34,30 +43,56 @@
             </button>
         </form>
 
+        <!-- Loader -->
         <div class="loader" id="loader">
             <div class="spinner"></div>
             <span>Analyzing your comment...</span>
         </div>
 
+        <!-- Result - STAYS FOREVER (NO ANIMATION) -->
         <div class="result" id="result">
-            <div class="result-icon" id="resultIcon"></div>
-            <h2 id="resultTitle"></h2>
-            <div class="result-details">
-                <p><i class="fas fa-comment"></i> <strong>Original:</strong> <span id="originalText"></span></p>
-                <p><i class="fas fa-wand-magic-sparkles"></i> <strong>Processed:</strong> <span id="processedText"></span></p>
+            <div class="result-header">
+                <span class="result-icon" id="resultIcon"></span>
+                <h2 id="resultTitle"></h2>
             </div>
-            <div class="probability-section">
-                <div class="prob-item">
-                    <span>📬 Ham (Normal)</span>
-                    <span class="prob-value" id="hamProb">0%</span>
+
+            <div class="result-body">
+                <div class="result-details">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-comment"></i> Original:</span>
+                        <span class="detail-value" id="originalText"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-wand-magic-sparkles"></i> Processed:</span>
+                        <span class="detail-value" id="processedText"></span>
+                    </div>
                 </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="probFill" style="width: 0%;"></div>
+
+                <div class="probability-section">
+                    <div class="probability-labels">
+                        <div class="prob-item">
+                            <span>📬 Ham (Normal)</span>
+                            <span class="prob-value" id="hamProb">0%</span>
+                        </div>
+                        <div class="prob-item">
+                            <span>🚨 Spam</span>
+                            <span class="prob-value" id="spamProb">0%</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="probFill" style="width: 0%;"></div>
+                    </div>
+                    <div class="probability-indicator">
+                        <span>●</span> Spam Probability
+                    </div>
                 </div>
-                <div class="prob-item" style="margin-top:8px;">
-                    <span>🚨 Spam</span>
-                    <span class="prob-value" id="spamProb">0%</span>
-                </div>
+            </div>
+
+            <div class="result-footer">
+                <span class="result-timestamp" id="resultTimestamp"></span>
+                <button class="btn-clear-result" id="clearResult" title="Clear result">
+                    <i class="fas fa-xmark"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -65,131 +100,361 @@
     <!-- Stats -->
     <div class="stats-section">
         <div class="stat-card">
-            <span class="stat-icon" style="color:#22c55e;">✅</span>
+            <span class="stat-icon" style="color:var(--color-success);">✅</span>
             <span class="stat-number" id="hamCount">0</span>
-            <span class="stat-label">Ham (Clean)</span>
+            <span class="stat-label">Ham</span>
         </div>
         <div class="stat-card">
-            <span class="stat-icon" style="color:#ef4444;">🚨</span>
+            <span class="stat-icon" style="color:var(--color-danger);">🚨</span>
             <span class="stat-number" id="spamCount">0</span>
-            <span class="stat-label">Spam Detected</span>
+            <span class="stat-label">Spam</span>
         </div>
         <div class="stat-card">
-            <span class="stat-icon" style="color:#667eea;">📊</span>
+            <span class="stat-icon" style="color:var(--color-primary);">📊</span>
             <span class="stat-number" id="totalCount">0</span>
-            <span class="stat-label">Total Analyzed</span>
+            <span class="stat-label">Total</span>
         </div>
     </div>
 </div>
 
-<script>
-    // ===== Character Counter =====
-    document.getElementById('commentInput').addEventListener('input', function() {
-        document.getElementById('charCount').textContent = this.value.length;
-    });
+<style>
+    /* ===== Additional Styles ===== */
 
-    // ===== Stats =====
-    let stats = { ham: 0, spam: 0, total: 0 };
-
-    function updateStats(isSpam) {
-        if (isSpam) stats.spam++;
-        else stats.ham++;
-        stats.total++;
-
-        document.getElementById('hamCount').textContent = stats.ham;
-        document.getElementById('spamCount').textContent = stats.spam;
-        document.getElementById('totalCount').textContent = stats.total;
+    .result-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        margin-bottom: var(--space-4);
+        padding-bottom: var(--space-3);
+        border-bottom: 1px solid var(--border-subtle);
     }
 
-    // ===== Form Submit =====
-    document.getElementById('spamForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
+    .result-header .result-icon {
+        font-size: 40px;
+        flex-shrink: 0;
+    }
 
-        const comment = document.getElementById('commentInput').value.trim();
-        if (!comment) return;
+    .result-header h2 {
+        font-size: var(--text-xl);
+        font-weight: var(--font-bold);
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
 
+    .result-body {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+
+    .result-details {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: var(--radius-lg);
+        padding: var(--space-4) var(--space-5);
+        border: 1px solid var(--border-subtle);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    .detail-row {
+        display: flex;
+        gap: var(--space-3);
+        font-size: var(--text-sm);
+        line-height: 1.6;
+    }
+
+    .detail-label {
+        color: var(--text-tertiary);
+        font-weight: var(--font-medium);
+        min-width: 90px;
+        flex-shrink: 0;
+    }
+
+    .detail-label i {
+        width: 18px;
+        color: var(--text-quaternary);
+        margin-right: var(--space-1);
+    }
+
+    .detail-value {
+        color: var(--text-secondary);
+        word-break: break-word;
+        font-weight: var(--font-regular);
+    }
+
+    .probability-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: var(--text-sm);
+        color: var(--text-tertiary);
+        margin-bottom: var(--space-1);
+    }
+
+    .prob-item .prob-value {
+        font-weight: var(--font-semibold);
+        color: var(--text-secondary);
+    }
+
+    .probability-indicator {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        margin-top: var(--space-2);
+        font-size: var(--text-xs);
+        color: var(--text-quaternary);
+        letter-spacing: 0.3px;
+    }
+
+    .probability-indicator span:first-child {
+        color: var(--color-primary);
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    .result-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: var(--space-4);
+        padding-top: var(--space-3);
+        border-top: 1px solid var(--border-subtle);
+    }
+
+    .result-timestamp {
+        font-size: var(--text-xs);
+        color: var(--text-quaternary);
+    }
+
+    .btn-clear-result {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-full);
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-tertiary);
+        cursor: pointer;
+        transition: all var(--duration-base) var(--ease-default);
+        font-size: 14px;
+    }
+
+    .btn-clear-result:hover {
+        background: rgba(239, 68, 68, 0.08);
+        border-color: rgba(239, 68, 68, 0.15);
+        color: var(--color-danger);
+        transform: scale(1.05);
+    }
+
+    .result.spam .result-header h2 {
+        color: var(--color-danger);
+    }
+
+    .result.ham .result-header h2 {
+        color: var(--color-success);
+    }
+
+    .result.spam .progress-fill {
+        background: linear-gradient(90deg, #f59e0b, var(--color-danger));
+    }
+
+    .result.ham .progress-fill {
+        background: linear-gradient(90deg, var(--color-success), #22c55e);
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+        .result-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .result-header .result-icon {
+            font-size: 48px;
+        }
+
+        .detail-row {
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+
+        .detail-label {
+            min-width: unset;
+        }
+
+        .probability-labels {
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+
+        .result-footer {
+            flex-direction: column;
+            gap: var(--space-2);
+            text-align: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .result-header .result-icon {
+            font-size: 36px;
+        }
+
+        .result-header h2 {
+            font-size: var(--text-lg);
+        }
+
+        .result-details {
+            padding: var(--space-3);
+        }
+
+        .detail-row {
+            font-size: var(--text-xs);
+        }
+    }
+</style>
+
+<script>
+    (function() {
+        'use strict';
+
+        // DOM refs
+        const commentInput = document.getElementById('commentInput');
+        const charCount = document.getElementById('charCount');
+        const form = document.getElementById('spamForm');
         const loader = document.getElementById('loader');
         const resultDiv = document.getElementById('result');
         const submitBtn = document.getElementById('submitBtn');
+        const clearBtn = document.getElementById('clearResult');
 
-        loader.classList.add('show');
-        resultDiv.classList.remove('show', 'spam', 'ham');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+        // Stats
+        let stats = { ham: 0, spam: 0, total: 0 };
 
-        try {
-            const formData = new FormData();
-            formData.append('comment', comment);
+        // ===== Character Counter =====
+        commentInput.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
 
-            const response = await fetch('/predict/', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            });
+        // ===== Update Stats =====
+        function updateStats(isSpam) {
+            if (isSpam) stats.spam++;
+            else stats.ham++;
+            stats.total++;
 
-            const data = await response.json();
-
-            if (data.error) {
-                alert(data.error);
-                return;
-            }
-
-            // Show result
-            resultDiv.className = 'result show ' + (data.is_spam ? 'spam' : 'ham');
-
-            const icon = document.getElementById('resultIcon');
-            if (data.is_spam) {
-                icon.innerHTML = '🚨';
-                document.getElementById('resultTitle').textContent = '⚠️ Spam Detected!';
-            } else {
-                icon.innerHTML = '✅';
-                document.getElementById('resultTitle').textContent = '✔️ Ham — Clean Comment';
-            }
-
-            document.getElementById('originalText').textContent = data.comment;
-            document.getElementById('processedText').textContent = data.processed || '---';
-            document.getElementById('spamProb').textContent = data.spam_probability + '%';
-            document.getElementById('hamProb').textContent = data.ham_probability + '%';
-
-            // Animate progress bar
-            const fill = document.getElementById('probFill');
-            fill.style.width = data.spam_probability + '%';
-
-            // GSAP animation for result
-            gsap.from(resultDiv, {
-                duration: 0.7,
-                scale: 0.9,
-                opacity: 0,
-                ease: 'back.out(1.7)'
-            });
-
-            updateStats(data.is_spam);
-
-            document.getElementById('commentInput').value = '';
-            document.getElementById('charCount').textContent = '0';
-
-            setTimeout(() => location.reload(), 3000);
-
-        } catch (error) {
-            alert('Connection error! Please try again.');
-            console.error(error);
-        } finally {
-            loader.classList.remove('show');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-rocket"></i> Analyze Now';
+            document.getElementById('hamCount').textContent = stats.ham;
+            document.getElementById('spamCount').textContent = stats.spam;
+            document.getElementById('totalCount').textContent = stats.total;
         }
-    });
 
-    // ===== Hover Animations =====
-    document.querySelectorAll('.stat-card').forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            gsap.to(this, { scale: 1.05, duration: 0.3, ease: 'power2.out' });
+        // ===== Clear Result =====
+        clearBtn.addEventListener('click', function() {
+            resultDiv.classList.remove('show', 'spam', 'ham');
+            document.getElementById('probFill').style.width = '0%';
         });
-        card.addEventListener('mouseleave', function() {
-            gsap.to(this, { scale: 1, duration: 0.3, ease: 'power2.out' });
+
+        // ===== Form Submit =====
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const comment = commentInput.value.trim();
+            if (!comment) return;
+
+            // Reset UI
+            loader.classList.add('show');
+            resultDiv.classList.remove('show', 'spam', 'ham');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+
+            try {
+                const formData = new FormData();
+                formData.append('comment', comment);
+
+                const response = await fetch('/predict/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                // ===== SHOW RESULT (STAYS FOREVER - NO ANIMATION) =====
+                resultDiv.className = 'result show ' + (data.is_spam ? 'spam' : 'ham');
+
+                const icon = document.getElementById('resultIcon');
+                const title = document.getElementById('resultTitle');
+
+                if (data.is_spam) {
+                    icon.textContent = '🚨';
+                    title.textContent = '⚠️ Spam Detected!';
+                } else {
+                    icon.textContent = '✅';
+                    title.textContent = '✔️ Ham — Clean Comment';
+                }
+
+                document.getElementById('originalText').textContent = data.comment;
+                document.getElementById('processedText').textContent = data.processed || '—';
+                document.getElementById('spamProb').textContent = data.spam_probability + '%';
+                document.getElementById('hamProb').textContent = data.ham_probability + '%';
+
+                const fill = document.getElementById('probFill');
+                fill.style.width = data.spam_probability + '%';
+
+                // Timestamp
+                const now = new Date();
+                const timestamp = now.toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                document.getElementById('resultTimestamp').textContent = '🕐 ' + timestamp;
+
+                // ============================================
+                // 🚨 NO ANIMATION - STAYS FOREVER
+                // 🚨 NO GSAP - NOTHING
+                // ============================================
+
+                updateStats(data.is_spam);
+
+                // Clear input
+                commentInput.value = '';
+                charCount.textContent = '0';
+
+            } catch (error) {
+                alert('Connection error. Please try again.');
+                console.error(error);
+            } finally {
+                loader.classList.remove('show');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-rocket"></i> Analyze Now';
+            }
         });
-    });
+
+        // ===== Hover Animations for Stats =====
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                gsap.to(this, {
+                    scale: 1.03,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
+            card.addEventListener('mouseleave', function() {
+                gsap.to(this, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
+        });
+
+    })();
 </script>
 {% endblock %}

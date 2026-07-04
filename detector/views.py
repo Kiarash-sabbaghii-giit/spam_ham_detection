@@ -13,7 +13,6 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 import nltk
 
-# Download stopwords if not available
 try:
     nltk.data.find('tokenizers/punkt')
 except LookupError:
@@ -22,10 +21,8 @@ except LookupError:
 
 # ========== Text Preprocessing ==========
 def preprocess_text(text):
-    # Lowercase
     text = text.lower()
 
-    # Remove emojis
     emoji_pattern = re.compile("["
                                u"\U0001F600-\U0001F64F"
                                u"\U0001F300-\U0001F5FF"
@@ -36,30 +33,18 @@ def preprocess_text(text):
                                "]+", flags=re.UNICODE)
     text = emoji_pattern.sub(r'', text)
 
-    # Remove links
     text = re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE)
-
-    # Remove mentions and hashtags
     text = re.sub(r'@\w+', '', text)
     text = re.sub(r'#\w+', '', text)
-
-    # Remove numbers
     text = re.sub(r'\d+', '', text)
-
-    # Remove punctuation
     text = text.translate(str.maketrans('', '', string.punctuation))
-
-    # Remove extra spaces
     text = re.sub(r'\s+', ' ', text).strip()
 
-    # Remove stopwords and stem
     stop_words = set(stopwords.words('english'))
     stemmer = PorterStemmer()
     words = text.split()
     words = [stemmer.stem(word) for word in words if word not in stop_words]
     text = ' '.join(words)
-
-    # Remove short words
     text = ' '.join([word for word in text.split() if len(word) > 2])
 
     return text
@@ -73,7 +58,7 @@ VECTORIZER_PATH = os.path.join(BASE_DIR, 'models', 'vectorizer.pkl')
 model = joblib.load(MODEL_PATH)
 vectorizer = joblib.load(VECTORIZER_PATH)
 
-# ========== History Storage ==========
+# ========== History ==========
 history = []
 
 
@@ -98,17 +83,12 @@ def predict(request):
     if not comment:
         return JsonResponse({'error': 'Please enter a comment!'}, status=400)
 
-    # Preprocess
     processed = preprocess_text(comment)
-
-    # Vectorize
     comment_vec = vectorizer.transform([processed])
 
-    # Predict
     prediction = model.predict(comment_vec)[0]
     probability = model.predict_proba(comment_vec)[0]
 
-    # Get probabilities
     if model.classes_[0] == 'ham':
         spam_prob = float(probability[1])
         ham_prob = float(probability[0])
@@ -126,7 +106,6 @@ def predict(request):
         'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
 
-    # Save to history
     history.insert(0, result)
     if len(history) > 50:
         history.pop()
