@@ -339,7 +339,6 @@ The interface was carefully designed to provide a premium user experience.
 ## 🏠 Home Page
 
 ```
-Add screenshot here
 
 assets/screenshots/home.png
 ```
@@ -349,7 +348,6 @@ assets/screenshots/home.png
 ## 📜 Prediction History
 
 ```
-Add screenshot here
 
 assets/screenshots/history.png
 ```
@@ -359,7 +357,6 @@ assets/screenshots/history.png
 ## ℹ️ About Page
 
 ```
-Add screenshot here
 
 assets/screenshots/about.png
 ```
@@ -379,7 +376,7 @@ https://your-demo-link.com
 ### GitHub Repository
 
 ```
-https://github.com/your-username/SpamDetector-Pro
+https://github.com/Kiarash-sabbaghii-giit/spam_ham_detection
 ```
 
 ---
