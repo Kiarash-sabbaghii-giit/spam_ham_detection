@@ -336,24 +336,27 @@ The interface was carefully designed to provide a premium user experience.
 
 ## 📸 Screenshots
 
-> **Note:** Add your screenshots to the `assets/screenshots/` folder.
-
 ### 🏠 Home Page
 
-![Home Page](https://via.placeholder.com/900x500/1a1a2e/667eea?text=SpamDetector+Pro+-+Home+Page)
+<p align="center">
+  <img src="assets/screenshots/home.png" alt="Home Page" width="90%"/>
+</p>
 
 ---
 
 ### 📜 Prediction History
 
-![History Page](https://via.placeholder.com/900x500/1a1a2e/667eea?text=SpamDetector+Pro+-+History+Page)
+<p align="center">
+  <img src="assets/screenshots/history.png" alt="History Page" width="90%"/>
+</p>
 
 ---
 
 ### ℹ️ About Page
 
-![About Page](https://via.placeholder.com/900x500/1a1a2e/667eea?text=SpamDetector+Pro+-+About+Page)
-
+<p align="center">
+  <img src="assets/screenshots/about.png" alt="About Page" width="90%"/>
+</p>
 # 🚀 Demo
 
 ### Live Demo
