@@ -334,29 +334,6 @@ The interface was carefully designed to provide a premium user experience.
 
 ---
 
-## 📸 Screenshots
-
-### 🏠 Home Page
-
-<p align="center">
-  <img src="assets/screenshots/home.png" alt="Home Page" width="90%"/>
-</p>
-
----
-
-### 📜 Prediction History
-
-<p align="center">
-  <img src="assets/screenshots/history.png" alt="History Page" width="90%"/>
-</p>
-
----
-
-### ℹ️ About Page
-
-<p align="center">
-  <img src="assets/screenshots/about.png" alt="About Page" width="90%"/>
-</p>
 # 🚀 Demo
 
 ### Live Demo
