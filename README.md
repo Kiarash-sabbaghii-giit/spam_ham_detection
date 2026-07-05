@@ -338,11 +338,8 @@ The interface was carefully designed to provide a premium user experience.
 
 ### Live Demo
 
-```
-https://your-demo-link.com
-```
+![Demo](demo.gif)
 
----
 
 ### GitHub Repository
 
