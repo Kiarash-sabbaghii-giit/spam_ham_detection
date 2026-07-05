@@ -21,6 +21,12 @@ An intelligent spam detection platform that combines the power of Machine Learni
 
 </p>
 
+# 🚀 Demo
+
+### Live Demo
+
+![Demo](demo.gif)
+
 ---
 
 ### 🎯 Accuracy: **98%**
@@ -333,13 +339,6 @@ The interface was carefully designed to provide a premium user experience.
 | Glass Blur | Cards |
 
 ---
-
-# 🚀 Demo
-
-### Live Demo
-
-![Demo](demo.gif)
-
 
 ### GitHub Repository
 
